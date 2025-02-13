@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
-import { Mic, Square, Loader, Wand2 } from 'lucide-react';
+import  { useState, useRef } from 'react';
+import {  Loader, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Orb from './Orb';
+
 
 function DreamRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  
-  const startRecording = () => {
-    setIsRecording(true);
-    setShowControls(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        setAudioBlob(audioBlob);
+        audioChunksRef.current = [];
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setShowControls(false);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+    }
   };
-  
+
   const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+    }
     setIsRecording(false);
     setIsProcessing(true);
     setTimeout(() => {
@@ -21,13 +44,30 @@ function DreamRecorder() {
     }, 2000);
   };
 
+  //const downloadAudio = () => {
+   /* if (audioBlob) {
+      const url = URL.createObjectURL(audioBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'dream-recording.wav';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };*/
+
+  const createNFT = (): void => {
+    console.log('Creating NFT...');
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-3xl mx-auto px-4 pt-32"
     >
-      <div className="relative bg-black border-2 border-white p-12">
+      <div className="relative bg-black   p-12">
         <motion.h1 
           className="text-5xl font-bold mb-16 text-center text-white uppercase glitch-effect"
           initial={{ opacity: 0 }}
@@ -63,19 +103,33 @@ function DreamRecorder() {
               <motion.button
                 key="record"
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`relative group ${isRecording ? 'recording-pulse' : ''}`}
+                className={`relative group`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <div className={`relative p-12 border-2 transition-colors ${
+                <div className={`relative p-12 border-2  ${
                   isRecording 
-                    ? 'bg-red-600 border-white' 
-                    : 'bg-black border-white hover:bg-white hover:text-black'
+                    ? ' border-none' 
+                    : ' border-none '
                 }`}>
                   {isRecording ? (
-                    <Square className="h-12 w-12" />
+                    <div style={{ width: '100%', height:'100%',  position: 'relative' ,scale:"2"}}>
+                    <Orb
+                      hoverIntensity={1.11}
+                      rotateOnHover={false}
+                      hue={288}
+                      forceHoverState={false}
+                    />
+                  </div>
                   ) : (
-                    <Mic className="h-12 w-12" />
+                    <div style={{ width: '100%', height:'100%',  position: 'relative', scale:"2"}}>
+                    <Orb
+                      hoverIntensity={0}
+                      rotateOnHover={false}
+                      hue={288}
+                      forceHoverState={false}
+                    />
+                  </div>
                   )}
                 </div>
               </motion.button>
@@ -94,8 +148,9 @@ function DreamRecorder() {
                   className="w-full py-6 bg-black text-white border-2 border-white hover:bg-white hover:text-black transition-all font-bold uppercase"
                   whileHover={{ scale: 1.02, x: 5 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={createNFT}
                 >
-                  Mint as NFT
+                 
                 </motion.button>
                 <motion.button 
                   className="w-full py-6 bg-white text-black border-2 border-white hover:bg-black hover:text-white transition-all font-bold uppercase"
@@ -113,4 +168,4 @@ function DreamRecorder() {
   );
 }
 
-export default DreamRecorder
+export default DreamRecorder;

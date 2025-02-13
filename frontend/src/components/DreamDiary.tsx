@@ -1,26 +1,15 @@
-import React from 'react';
 import { Calendar, Clock, Share2, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-
-const mockDreams = [
-  {
-    id: 1,
-    date: new Date(2024, 2, 15),
-    duration: '2:34',
-    imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800',
-    description: 'I was flying through clouds made of cotton candy, surrounded by iridescent butterflies that whispered ancient secrets...'
-  },
-  {
-    id: 2,
-    date: new Date(2024, 2, 14),
-    duration: '3:12',
-    imageUrl: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800',
-    description: 'Exploring a crystal cave beneath the ocean, where bioluminescent creatures danced in intricate patterns...'
-  }
-];
+import useNFTStore from '../stores/nftStore';
 
 function DreamDiary() {
+  const { nfts, loading, error } = useNFTStore();
+
+  // If loading or error, display a message
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -49,9 +38,9 @@ function DreamDiary() {
         initial="hidden"
         animate="show"
       >
-        {mockDreams.map((dream, index) => (
+        {nfts.map((nft) => (
           <motion.div
-            key={dream.id}
+            key={nft.tokenId}
             variants={{
               hidden: { opacity: 0, x: -50 },
               show: { opacity: 1, x: 0 }
@@ -65,8 +54,7 @@ function DreamDiary() {
                 whileHover={{ scale: 1.02 }}
               >
                 <img 
-                  src={dream.imageUrl} 
-                  alt="Dream visualization" 
+                  src={nft.metadata.image.replace('ipfs://', '')+'.ipfs.dweb.link'} 
                   className="w-full h-64 md:h-full object-cover filter grayscale hover:grayscale-0 transition-all"
                 />
               </motion.div>
@@ -75,16 +63,16 @@ function DreamDiary() {
                 <div className="flex items-center space-x-6 text-white mb-6 uppercase font-mono">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{format(dream.date, 'dd/MM/yyyy')}</span>
+                    <span>{nft.metadata.date ? format(new Date(nft.metadata.date), 'dd/MM/yyyy') : 'Date not available'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4" />
-                    <span>{dream.duration}</span>
+                    <span>{nft.metadata.duration || 'Duration not available'}</span>
                   </div>
                 </div>
                 
                 <p className="text-white mb-8 text-lg font-mono leading-relaxed">
-                  {dream.description}
+                  {nft.metadata.description || 'Description not available'}
                 </p>
                 
                 <div className="flex space-x-4">
@@ -114,4 +102,4 @@ function DreamDiary() {
   );
 }
 
-export default DreamDiary
+export default DreamDiary;

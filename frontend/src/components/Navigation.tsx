@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Moon, BookOpen, Brain, Music } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ConnectWallet from './connectWallet';
 
 function Navigation() {
   const location = useLocation();
@@ -79,6 +80,7 @@ function Navigation() {
                 <span>PLAYLIST</span>
               </div>
             </motion.button>
+            <ConnectWallet/>
           </div>
         </div>
       </div>
