@@ -23,7 +23,7 @@ def venice_chat(prompt,system_prompt):
             },
             {
                 "role": "user",
-                "content": "Give a json with title,short_description of story, continuing this story line :"+prompt
+                "content": "Give a json with one title,short_description of story, continuing this story line :"+prompt
             }
         ],
         "temperature": 0.8

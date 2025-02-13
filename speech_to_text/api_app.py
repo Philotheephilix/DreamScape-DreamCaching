@@ -8,10 +8,28 @@ from middleware import jsonValidation
 from controller.ollama import query_ollama
 from controller.veniceImage import generate_image
 from controller.veniceChat import venice_chat
+from controller.spotify import main as SpotifyPlaylistCreator
 
 app = Flask(__name__)
 
 pipe = pipeline("automatic-speech-recognition", model="fractalego/personal-speech-to-text-model")
+
+@app.route('/create-playlist', methods=['POST'])
+def create_playlist():
+    data = request.get_json()
+    
+    if not data or 'mood' not in data or 'language' not in data:
+        return jsonify({"error": "Missing required fields: mood and language"}), 400
+    
+    mood = data['mood']
+    language = data['language']
+    playlistLink=SpotifyPlaylistCreator(mood,language)
+    return jsonify({
+        "status": "success",
+        "mood": mood,
+        "language": language,
+        'playlistLink':playlistLink
+})
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe_audio():
@@ -54,7 +72,8 @@ def transcribe_audio():
         cover_location=generate_image(full_description,381,[""])
         print("cover image done")
 
-        coverData=venice_chat(full_description,"Return only a JSON array with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON array.")
+        coverData=venice_chat(full_description,"Return only a JSON with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the single JSON.")
+        print(coverData)
         coverData=jsonValidation.extract_and_validate_json(coverData)
         print(coverData)
         print("cover data done")
@@ -79,7 +98,7 @@ def transcribe_audio():
         
         return jsonify({
             "status": "success",
-            "hash":response
+            "hash":response.json()
         })
         
     except Exception as e:
