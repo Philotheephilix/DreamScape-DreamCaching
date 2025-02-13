@@ -1,6 +1,7 @@
 import React from 'react';
 import { Brain, Moon, TrendingUp, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PostTweet from './X';
 
 export interface MentalHealthData {
   dreamPatterns: string;
@@ -12,20 +13,20 @@ export interface MentalHealthData {
 
 export default function MentalHealthInsights({ data }: { data: MentalHealthData }) {
   return (
-    <motion.div 
+    <><motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="max-w-6xl mx-auto px-4 pt-32"
     >
-      <motion.h1 
+      <motion.h1
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         className="text-5xl font-bold mb-16 text-white uppercase glitch-effect"
       >
         Mental Health Insights
       </motion.h1>
-      
-      <motion.div 
+
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-8"
         variants={{
           hidden: { opacity: 0 },
@@ -80,8 +81,8 @@ export default function MentalHealthInsights({ data }: { data: MentalHealthData 
           </motion.div>
         ))}
       </motion.div>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -97,6 +98,6 @@ export default function MentalHealthInsights({ data }: { data: MentalHealthData 
           {data.weeklySummary}
         </p>
       </motion.div>
-    </motion.div>
+    </motion.div><PostTweet /></>
   );
 }

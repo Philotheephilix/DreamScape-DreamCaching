@@ -11,9 +11,9 @@ from models.venice import headers
 # print(response.text)
 
 url = "https://api.venice.ai/api/v1/chat/completions"
-system_prompt = """You are a Storytelling AI assistant. Your task is to analyze the input and frame the scenewise story and background description. Return only a JSON array with objects containing the keys 'scenceNumber', 'backgroundDescription', and 'story'. Do not output any additional text or explanations, only the JSON array."""
+# system_prompt = """You are a Storytelling AI assistant. Your task is to analyze the input and frame the scenewise story and background description. Return only a JSON array with objects containing the keys 'scenceNumber', 'backgroundDescription', and 'story'. Do not output any additional text or explanations, only the JSON array."""
 
-def venice_chat(prompt):
+def venice_chat(prompt,system_prompt):
     payload = {
         "model": "dolphin-2.9.2-qwen2-72b",
         "messages": [
@@ -23,7 +23,7 @@ def venice_chat(prompt):
             },
             {
                 "role": "user",
-                "content": "Give a json array of story of continuing this story line :"+prompt
+                "content": "Give a json with title,short_description of story, continuing this story line :"+prompt
             }
         ],
         "temperature": 0.8
