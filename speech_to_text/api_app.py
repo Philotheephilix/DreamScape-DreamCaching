@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
+import requests
 from transformers import pipeline
 import tempfile
 import os
+import time
 from middleware import jsonValidation
 from controller.ollama import query_ollama
 from controller.veniceImage import generate_image
+from controller.veniceChat import venice_chat
 
 app = Flask(__name__)
 
@@ -29,17 +32,45 @@ def transcribe_audio():
             
         result = pipe(tmp_path)
         transcription = result['text']
+        print("transcription done")
         os.unlink(tmp_path)
         
         ollama_response = query_ollama(transcription)["response"]
         validated_response = jsonValidation.extract_and_validate_json(ollama_response)
         print("Done")
+        print("ollama done")
+
         validated_response_list=list(validated_response)
         image_locations=[]
+        full_description=''
         for scene in validated_response_list:
+            full_description= full_description+ scene["backgroundDescription"]+"\n"
             print(scene["backgroundDescription"])
-            image_locations.append(generate_image(scene["backgroundDescription"],scene["sceneNumber"],list(scene["story"])))
+            print("per image done")
 
+            image_locations.append(generate_image(scene["backgroundDescription"],scene["sceneNumber"],list(scene["story"])))
+        print("all image done")
+        
+        cover_location=generate_image(full_description,381,[""])
+        print("cover image done")
+
+        coverData=venice_chat(full_description,"Return only a JSON array with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON array.")
+        coverData=jsonValidation.extract_and_validate_json(coverData)
+        print(coverData)
+        print("cover data done")
+
+        metadata={
+            'ipfsArray':image_locations,
+            'coverImage':cover_location,
+            'timeStamp':str(time.time()),
+            'coverData':coverData,
+            'fullDescription':full_description
+        }
+        url = 'http://localhost:5000/upload-json'
+
+        # Send the metadata as JSON in the request body
+        response = requests.post(url, json={'metadata': metadata})
+        print(metadata)
         if "error" in ollama_response:
             return jsonify({
                 "status": "error",
@@ -48,16 +79,15 @@ def transcribe_audio():
         
         return jsonify({
             "status": "success",
-            "transcription": transcription,
-            "ollama_response": validated_response_list,
-            "image_locations": image_locations,
+            "hash":response
         })
         
     except Exception as e:
+        print(e)
         return jsonify({
             "status": "error",
             "message": f"Error processing file: {str(e)}"
         }), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

@@ -5,3 +5,4 @@
 *.pyc
 /backend/node_modules
 /backend/creds
+frontend/bun.lockb

@@ -1,23 +1,24 @@
 import React from 'react';
 import { Brain, Moon, TrendingUp, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PostTweet from './X';
 
 function MentalHealthInsights() {
   return (
-    <motion.div 
+    <><motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="max-w-6xl mx-auto px-4 pt-32"
     >
-      <motion.h1 
+      <motion.h1
         initial={{ y: -20 }}
         animate={{ y: 0 }}
         className="text-5xl font-bold mb-16 text-white uppercase glitch-effect"
       >
         Mental Health Insights
       </motion.h1>
-      
-      <motion.div 
+
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-2 gap-8"
         variants={{
           hidden: { opacity: 0 },
@@ -72,8 +73,8 @@ function MentalHealthInsights() {
           </motion.div>
         ))}
       </motion.div>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
@@ -86,13 +87,13 @@ function MentalHealthInsights() {
           <h2 className="text-2xl font-bold uppercase">Weekly Summary</h2>
         </div>
         <p className="font-mono leading-relaxed">
-          Your dream journal entries this week indicate a significant positive trend in your mental well-being. 
-          The recurring themes of exploration and transformation suggest a period of personal growth. 
-          Your sleep patterns have stabilized, contributing to improved emotional regulation and creativity. 
+          Your dream journal entries this week indicate a significant positive trend in your mental well-being.
+          The recurring themes of exploration and transformation suggest a period of personal growth.
+          Your sleep patterns have stabilized, contributing to improved emotional regulation and creativity.
           Continue maintaining your current sleep schedule and dream journaling practice for optimal results.
         </p>
       </motion.div>
-    </motion.div>
+    </motion.div><PostTweet /></>
   );
 }
 

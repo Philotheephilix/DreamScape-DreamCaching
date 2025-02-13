@@ -8,7 +8,7 @@ def add_comic_text(base64_image,texts):
     image = Image.open(io.BytesIO(image_data)).convert("RGBA")
     draw = ImageDraw.Draw(image)
 
-    font_path = "comic_text.ttf"
+    font_path = "fonts/comic_text.ttf"
     font_size = 30
     font = ImageFont.truetype(font_path, font_size)
 
@@ -49,7 +49,5 @@ def add_comic_text(base64_image,texts):
     output_buffer = io.BytesIO()
     image.save(output_buffer, format="PNG")
     output_buffer.seek(0)
-    output_path = "output_image_with_dynamic_boxes.png"
-    image.save(output_path)
     output_base64 = base64.b64encode(output_buffer.getvalue()).decode("utf-8")
     return output_base64
