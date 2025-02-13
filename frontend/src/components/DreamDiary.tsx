@@ -1,4 +1,4 @@
-import { Calendar, Clock, Share2, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, Share2, ExternalLink, Wand2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import useNFTStore from '../stores/nftStore';
@@ -7,8 +7,28 @@ import { Link } from 'react-router-dom';
 function DreamDiary() {
   const { nfts, loading, error } = useNFTStore();
 
-  // If loading or error, display a message
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <motion.div 
+      key="processing"
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      exit={{ scale: 0 }}
+      className="relative h-screen flex flex-col items-center justify-center"
+    >
+      <div className="absolute inset-0 bg-black opacity-20" />
+      <Loader2 className="h-32 w-32 text-white animate-spin mb-8" />
+      <motion.div
+        className="flex items-center space-x-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Wand2 className="h-5 w-5 text-white" />
+        <span className="text-white uppercase">Fetching Dream Dairy...</span>
+      </motion.div>
+    </motion.div>
+  );
+
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -40,7 +60,6 @@ function DreamDiary() {
         animate="show"
       >
         {nfts.map((nft) => (
-         
           <motion.div
             key={nft.tokenId}
             variants={{
@@ -55,16 +74,16 @@ function DreamDiary() {
                 className="md:w-2/5 relative overflow-hidden border-b-2 md:border-b-0 md:border-r-2 border-white"
                 whileHover={{ scale: 1.02 }}
               >
-               <img 
-          src={
-            nft?.metadata?.coverImage
-              ? `https://${nft.metadata.coverImage.replace('ipfs://', '')}.ipfs.dweb.link`
-              : nft?.metadata?.image
-              ? `https://${nft.metadata.image.replace('ipfs://', '')}.ipfs.dweb.link`
-              : '/fallback-image.jpg' // Use a default fallback image
-          } 
-          className="w-full h-64 md:h-full object-cover filter grayscale hover:grayscale-0 transition-all"
-        />
+                <img 
+                  src={
+                    nft?.metadata?.coverImage
+                      ? `https://${nft.metadata.coverImage.replace('ipfs://', '')}.ipfs.dweb.link`
+                      : nft?.metadata?.image
+                      ? `https://${nft.metadata.image.replace('ipfs://', '')}.ipfs.dweb.link`
+                      : '/fallback-image.jpg'
+                  } 
+                  className="w-full h-64 md:h-full object-cover filter grayscale hover:grayscale-0 transition-all"
+                />
               </motion.div>
               
               <div className="p-8 md:w-3/5">
@@ -84,16 +103,16 @@ function DreamDiary() {
                 </p>
                 
                 <div className="flex space-x-4">
-                <Link to={`/nft/${nft.tokenId}`}>
-  <motion.button 
-    whileHover={{ scale: 1.05, x: 5 }}
-    whileTap={{ scale: 0.95 }}
-    className="px-6 py-3 bg-white text-black font-bold uppercase border-2 border-white hover:bg-black hover:text-white transition-all flex items-center space-x-2"
-  >
-    <ExternalLink className="h-4 w-4" />
-    <span>View NFT</span>
-  </motion.button>
-</Link>
+                  <Link to={`/nft/${nft.tokenId}`}>
+                    <motion.button 
+                      whileHover={{ scale: 1.05, x: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-6 py-3 bg-white text-black font-bold uppercase border-2 border-white hover:bg-black hover:text-white transition-all flex items-center space-x-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span>View NFT</span>
+                    </motion.button>
+                  </Link>
                   <motion.button 
                     whileHover={{ scale: 1.05, x: -5 }}
                     whileTap={{ scale: 0.95 }}
