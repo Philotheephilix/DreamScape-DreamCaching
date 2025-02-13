@@ -38,7 +38,7 @@ def transcribe_audio():
         image_locations=[]
         for scene in validated_response_list:
             print(scene["backgroundDescription"])
-            image_locations.append(generate_image(scene["backgroundDescription"]))
+            image_locations.append(generate_image(scene["backgroundDescription"],scene["sceneNumber"],list(scene["story"])))
 
         if "error" in ollama_response:
             return jsonify({
@@ -49,6 +49,7 @@ def transcribe_audio():
         return jsonify({
             "status": "success",
             "transcription": transcription,
+            "ollama_response": validated_response_list,
             "image_locations": image_locations,
         })
         

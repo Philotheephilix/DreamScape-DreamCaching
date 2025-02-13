@@ -9,9 +9,11 @@ import time
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
 from models.venice import headers
+from commicizer import add_comic_text
+
 # "Bsky from Texas is reaching out to Nigar, their casual and friendly interaction suggests a long-standing partnership or camaraderie. The setting is a bustling cityscape where both have established roots, possibly in the same town or city."
 url = "https://api.venice.ai/api/v1/image/generate"
-def generate_image(prompt):
+def generate_image(prompt, scene_number,texts):
 
     payload = {
         "model": "flux-dev",
@@ -37,13 +39,15 @@ def generate_image(prompt):
             images = response_json.get("images", [])
             
             if images:
-                image_data = base64.b64decode(images[0])
-                file_path = f"./tmp/generated_image_{uuid.uuid4().hex}_{int(time.time())}.png"
-                
-                with open(file_path, "wb") as file:
-                    file.write(image_data)
-                
-                return file_path
+                comic_image=add_comic_text(images[0],texts=texts)
+                upload_url = "http://localhost:3000/upload-image"
+                upload_payload = {
+                    "base64Image": comic_image,
+                    "scene_number": scene_number
+                }
+                upload_response = requests.post(upload_url, json=upload_payload)
+                print (upload_response.json().get("fileId"))
+                return upload_response.json().get("fileId")
             else:
                 print("Error: No image data found in response.")
         except json.JSONDecodeError:
@@ -51,5 +55,5 @@ def generate_image(prompt):
     else:
         print(f"Error: {response.status_code}, {response.text}")
 
-# file_stored=generate_image("Bsky from Texas is reaching out to Nigar, their casual and friendly interaction suggests a long-standing partnership or camaraderie. The setting is a bustling cityscape where both have established roots, possibly in the same town or city.")
+file_stored=generate_image("Bsky from Texas is reaching out to Nigar, their casual and friendly interaction suggests a long-standing partnership or camaraderie. The setting is a bustling cityscape where both have established roots, possibly in the same town or city.",0,texts=[' joe is a good boy','joe has recently purchasd 8gb ddr4 sodimm memory @ 2666 mhz but it will only run on 2133'])
 # print(file_stored)
