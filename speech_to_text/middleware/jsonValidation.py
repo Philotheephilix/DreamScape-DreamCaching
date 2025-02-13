@@ -41,6 +41,45 @@ def extract_and_validate_json(response):
         print(f"Error: {e}")
         return None
 
+
+def extract_and_validate_json_version2(response):
+    try:
+        print("Raw response:", response)  # Debugging Step 1
+
+        # Ensure response is a string
+        if not isinstance(response, str):
+            print("Error: Response is not a string")
+            return None
+
+        # Regex pattern to extract JSON content (list or object)
+        json_pattern = r"(\{.*?\}|\[.*?\])"
+        match = re.search(json_pattern, response, re.DOTALL)
+
+        if not match:
+            print("No JSON match found")
+            return None
+        
+        json_str = match.group(0).strip()
+        print("Extracted JSON string:", json_str)  # Debugging Step 2
+
+        # Parse and validate JSON
+        json_data = json.loads(json_str)
+        print("Parsed JSON:", json_data)  # Debugging Step 3
+
+        return json_data
+
+    except json.JSONDecodeError as e:
+        print(f"JSONDecodeError: {e}")
+        return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+# Example test
+
+
+
 # Example usage
 # response = """
 # <think>

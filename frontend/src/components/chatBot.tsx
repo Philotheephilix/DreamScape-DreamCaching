@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Moon, TrendingUp, Clock, Heart } from 'lucide-react';
 import useNFTStore from '../stores/nftStore'; // Zustand store for NFT data
+import { MentalHealthData } from './MentalHealthInsights';
 
 interface NFT {
   metadata?: {
     description?: string;
   };
 }
-
-function Chatbot() {
+interface ChatbotProps {
+    onAnalysisComplete: (result: MentalHealthData) => void;
+  }
+function Chatbot({ onAnalysisComplete }: ChatbotProps) {
   const [step, setStep] = useState(0);
   const [responses, setResponses] = useState<Record<number, string>>({});
   const [inputValue, setInputValue] = useState('');
@@ -26,33 +29,30 @@ function Chatbot() {
     if (inputValue.trim() === '') return; // Prevent empty responses
     setResponses((prev) => ({
       ...prev,
-      [step]: inputValue
+      [questions[step]]: inputValue
     }));
     setInputValue(''); // Clear the input field
     setStep((prev) => prev + 1); // Move to the next question
   };
 
   const handleSubmit = async () => {
-    const payload = {
-      responses,
-      nftDescriptions: nfts.map((nft: NFT) => nft.metadata?.description || '')
-    };
+    const payload = { responses };
 
     try {
-      const response = await fetch('/analysis', {
+      const response = await fetch('http://localhost:5001/analysis', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
-      console.log(result); // Handle the result (e.g., update state or display insights)
+      const result: MentalHealthData = await response.json();
+      console.log('Analysis result:', result);
+      onAnalysisComplete(result); // Pass result to parent
     } catch (error) {
       console.error('Error submitting data:', error);
     }
   };
+
 
   return (
     <motion.div
@@ -119,3 +119,4 @@ function Chatbot() {
 }
 
 export default Chatbot;
+

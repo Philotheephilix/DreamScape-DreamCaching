@@ -14,7 +14,7 @@ function NFTComic() {
 
   if (!nft) return <div className="text-white text-center pt-32">NFT not found</div>;
 
-  const images = nft.metadata.ipfsarray?.map((ipfs: string) => 
+  const images = nft.metadata.ipfsArray?.map((ipfs: string) => 
     `https://${ipfs.replace('ipfs://', '')}.ipfs.dweb.link`
   ) || [];
 
@@ -130,20 +130,7 @@ function NFTComic() {
 
           {/* Dreamy Details Section */}
           <div className="p-8 md:w-1/3 bg-gradient-to-b from-black/60 to-purple-900/20 backdrop-blur-lg">
-            <div className="flex items-center space-x-6 text-white/80 mb-6 uppercase font-mono">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-purple-400" />
-                <span>
-                  {nft.metadata.date ? 
-                    format(new Date(nft.metadata.date), 'dd MMM yyyy') : 
-                    'Date not available'}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-cyan-400" />
-                <span>{nft.metadata.duration || 'Duration not available'}</span>
-              </div>
-            </div>
+            
 
             <motion.h2
               initial={{ opacity: 0, y: 10 }}
@@ -158,7 +145,7 @@ function NFTComic() {
               animate={{ opacity: 1 }}
               className="text-white/90 mb-8 text-lg font-mono leading-relaxed border-l-4 border-purple-500/50 pl-4"
             >
-              {nft.metadata.description || 'Description not available'}
+              {nft.metadata.coverData || 'Description not available'}
             </motion.p>
 
             {/* Enchanted Image Indicators */}

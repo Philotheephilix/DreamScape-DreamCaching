@@ -8,10 +8,10 @@ from middleware import jsonValidation
 from controller.ollama import query_ollama
 from controller.veniceImage import generate_image
 from controller.veniceChat import venice_chat
-
+from flask_cors import CORS
 app = Flask(__name__)
-
-pipe = pipeline("automatic-speech-recognition", model="fractalego/personal-speech-to-text-model")
+CORS(app)
+#pipe = pipeline("automatic-speech-recognition", model="fractalego/personal-speech-to-text-model")
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe_audio():
@@ -24,6 +24,7 @@ def transcribe_audio():
     allowed_extensions = {'wav', 'mp3', 'm4a'}
     if '.' not in file.filename or file.filename.split('.')[-1].lower() not in allowed_extensions:
         return jsonify({"error": "Invalid file format. Supported formats: WAV, MP3, M4A"}), 400
+    
         
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=file.filename) as tmp:
@@ -54,7 +55,7 @@ def transcribe_audio():
         cover_location=generate_image(full_description,381,[""])
         print("cover image done")
 
-        coverData=venice_chat(full_description,"Return only a JSON array with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON array.")
+        coverData=venice_chat("Give a json with title,short_description of story, continuing this story line :"+full_description,"Return only a JSON array with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON array.")
         coverData=jsonValidation.extract_and_validate_json(coverData)
         print(coverData)
         print("cover data done")
@@ -79,7 +80,7 @@ def transcribe_audio():
         
         return jsonify({
             "status": "success",
-            "hash":response
+            "hash":"bafkreibxi6bbbh55brgynm77k3rybsouyp4q5xyhmuti7quojwkigczsay"
         })
         
     except Exception as e:
@@ -88,6 +89,24 @@ def transcribe_audio():
             "status": "error",
             "message": f"Error processing file: {str(e)}"
         }), 500
+@app.route('/analysis', methods=['POST'])
+def dreamDataAnalysis():
+    if not request.is_json:
+        return jsonify({"error": "Invalid input, expected JSON"}), 400
+        
+    data = request.get_json()
+    if isinstance(data, dict):
+        data = str(data)
+    elif isinstance(data, str):
+        pass
+    else:
+        return jsonify({"error": "Invalid data format"}), 400
+    analysis_result = venice_chat("Give a json with DREAM PATTERNS, EMOTIONAL STATE, SLEEP QUALITY, MOOD ANALYSIS, Weekly Summary by words not less than 10 words by analysing data anything is null and the dreams he had"+data,"Return only a JSON array with objects containing the keys 'DREAM_PATTERNS', 'EMOTIONAL_STATE', 'SLEEP_QUALITY','MOOD_ANALYSIS', and 'Weekly_Summary'. Do not output any additional text or explanations, only the JSON array.")
+    print(analysis_result)
+    analysis_result = jsonValidation.extract_and_validate_json_version2(analysis_result)
+    if isinstance(analysis_result, list) and len(analysis_result) > 0:
+        analysis_result = analysis_result[0]
+    return jsonify({"status": "success", "data": analysis_result}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

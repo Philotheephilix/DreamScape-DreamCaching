@@ -4,14 +4,16 @@ import { motion } from 'framer-motion';
 import PostTweet from './X';
 
 export interface MentalHealthData {
-  dreamPatterns: string;
-  emotionalState: string;
-  sleepQuality: string;
-  moodAnalysis: string;
-  weeklySummary: string;
+  data: any;
+  DREAM_PATTERNS: string;
+  EMOTIONAL_STATE: string;
+  SLEEP_QUALITY: string;
+  MOOD_ANALYSIS: string;
+  Weekly_Summary: string;
 }
 
 export default function MentalHealthInsights({ data }: { data: MentalHealthData }) {
+  console.log(data.data.DREAM_PATTERNS);
   return (
     <><motion.div
       initial={{ opacity: 0 }}
@@ -44,22 +46,22 @@ export default function MentalHealthInsights({ data }: { data: MentalHealthData 
           {
             icon: Moon,
             title: "DREAM PATTERNS",
-            content: data.dreamPatterns
+            content: data.data.DREAM_PATTERNS === "null" ? "No Data Available" : data.data.DREAM_PATTERNS
           },
           {
             icon: Brain,
             title: "EMOTIONAL STATE",
-            content: data.emotionalState
+            content: data.data.EMOTIONAL_STATE === "null" ? "No Data Available" : data.data.EMOTIONAL_STATE
           },
           {
             icon: Clock,
             title: "SLEEP QUALITY",
-            content: data.sleepQuality
+            content: data.data.SLEEP_QUALITY=== "null" ? "No Data Available" : data.data.SLEEP_QUALITY
           },
           {
             icon: Heart,
             title: "MOOD ANALYSIS",
-            content: data.moodAnalysis
+            content: data.data.MOOD_ANALYSIS=== "null" ? "No Data Available" : data.data.MOOD_ANALYSIS
           }
         ].map((item, index) => (
           <motion.div
@@ -95,7 +97,7 @@ export default function MentalHealthInsights({ data }: { data: MentalHealthData 
           <h2 className="text-2xl font-bold uppercase">Weekly Summary</h2>
         </div>
         <p className="font-mono leading-relaxed">
-          {data.weeklySummary}
+          {data.data.Weekly_Summary}
         </p>
       </motion.div>
     </motion.div><PostTweet /></>

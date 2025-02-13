@@ -40,6 +40,7 @@ function DreamDiary() {
         animate="show"
       >
         {nfts.map((nft) => (
+         
           <motion.div
             key={nft.tokenId}
             variants={{
@@ -54,26 +55,32 @@ function DreamDiary() {
                 className="md:w-2/5 relative overflow-hidden border-b-2 md:border-b-0 md:border-r-2 border-white"
                 whileHover={{ scale: 1.02 }}
               >
-                <img 
-                  src={nft.metadata.image.replace('ipfs://', '')+'.ipfs.dweb.link'} 
-                  className="w-full h-64 md:h-full object-cover filter grayscale hover:grayscale-0 transition-all"
-                />
+               <img 
+          src={
+            nft?.metadata?.coverImage
+              ? `https://${nft.metadata.coverImage.replace('ipfs://', '')}.ipfs.dweb.link`
+              : nft?.metadata?.image
+              ? `https://${nft.metadata.image.replace('ipfs://', '')}.ipfs.dweb.link`
+              : '/fallback-image.jpg' // Use a default fallback image
+          } 
+          className="w-full h-64 md:h-full object-cover filter grayscale hover:grayscale-0 transition-all"
+        />
               </motion.div>
               
               <div className="p-8 md:w-3/5">
                 <div className="flex items-center space-x-6 text-white mb-6 uppercase font-mono">
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{nft.metadata.date ? format(new Date(nft.metadata.date), 'dd/MM/yyyy') : 'Date not available'}</span>
+                    <span>{nft.metadata.date ? format(new Date(nft.metadata.timeStamp), 'dd/MM/yyyy') : 'Date not available'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4" />
-                    <span>{nft.metadata.duration || 'Duration not available'}</span>
+                    <span>{nft.metadata.timeStamp || 'Duration not available'}</span>
                   </div>
                 </div>
                 
                 <p className="text-white mb-8 text-lg font-mono leading-relaxed">
-                  {nft.metadata.description || 'Description not available'}
+                  {nft.metadata.fullDescription || 'Description not available'}
                 </p>
                 
                 <div className="flex space-x-4">

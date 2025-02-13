@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Loader, Wand2, Mic,X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {ethers} from 'ethers';
 import Orb from './Orb';
 
 function DreamRecorder() {
@@ -16,7 +17,8 @@ function DreamRecorder() {
   const analyserRef = useRef<AnalyserNode>();
   const audioContextRef = useRef<AudioContext>();
   const previousDataRef = useRef<number[]>([]);
-
+  const [coverImage, setCoverImage] = useState<string>('');
+  const [metadataCID, setMetadataCID] = useState<string>('');
   useEffect(() => {
     return () => {
       if (animationRef.current) {
@@ -169,17 +171,72 @@ function DreamRecorder() {
     }
     setIsRecording(false);
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setShowModal(true);
-    }, 2000);
+    mediaRecorderRef.current!.onstop = async () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      audioChunksRef.current = []; // Clear the stored chunks
+  
+      // Create a FormData object to send the audio file
+      const formData = new FormData();
+      formData.append("file", audioBlob, "recording.wav");
+  
+      try {
+        const response = await fetch("http://localhost:5001/transcribe", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const metadataHash = await response.json();
+        console.log("Transcription result:", metadataHash);
+        setMetadataCID(metadataHash.hash);
+        const metadataContent = await fetch(`https://${metadataHash.hash}.ipfs.dweb.link`);
+        const metadata = await metadataContent.json();
+        console.log("Metadata:", metadata);
+        setCoverImage(`https://${metadata.coverImage.replace("ipfs://", "")}.ipfs.dweb.link`);
+        console.log("Cover image:", coverImage);
+        // Stop processing after response is received
+        setIsProcessing(false);
+        setShowModal(true);
+      } catch (error) {
+        console.error("Error transcribing audio:", error);
+        setIsProcessing(false);
+      }
+    };
   };
 
 
-  const createNFT = (): void => {
-    console.log('Creating NFT...');
-    setShowModal(true);
-  };
+  const createNFT = async (): Promise<{ success: boolean; metadataURI: string; transactionHash: string }> => {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const userAddress = accounts[0];
+    const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const ABI = [
+            "function safeMint(address to, string memory uri) public",
+            "function balanceOf(address owner) external view returns (uint256)",
+            "function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256)",
+            "function tokenURI(uint256 tokenId) external view returns (string)",
+        ];
+
+        const contract = new ethers.Contract(
+            import.meta.env.VITE_PUBLIC_CONTRACT_ADDRESS,
+            ABI,
+            signer
+        );
+
+        // Calculate required ETH (0.01 ETH in this case)
+        const mintPrice = ethers.parseEther("0.01");
+
+        // Execute mint with payment
+        const tx = await contract.safeMint(userAddress, metadataCID);
+
+        const receipt = await tx.wait();
+        return {
+            success: true,
+            metadataURI: `ipfs://${metadataCID}`,
+            transactionHash: receipt.hash
+        };
+    } 
+
 
   return (
     <motion.div
@@ -242,7 +299,7 @@ function DreamRecorder() {
 
                 <motion.button
                   onClick={isRecording ? stopRecording : startRecording}
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.3 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <div className="relative p-12">
@@ -343,9 +400,9 @@ function DreamRecorder() {
               >
                 <X className="h-5 w-5 text-black" />
               </button>
-              <div className="flex flex-col items-center space-y-6">
+                <div className="flex flex-col items-center space-y-6">
                 <img
-                  src="https://via.placeholder.com/300" // Replace with your image URL
+                  src={coverImage}
                   alt="Dream NFT"
                   className="w-full h-auto rounded-lg"
                 />
@@ -364,7 +421,7 @@ function DreamRecorder() {
                 >
                   Share on Twitter
                 </motion.button>
-              </div>
+                </div>
             </motion.div>
           </motion.div>
         )}
