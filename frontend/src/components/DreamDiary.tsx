@@ -2,6 +2,7 @@ import { Calendar, Clock, Share2, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import useNFTStore from '../stores/nftStore';
+import { Link } from 'react-router-dom';
 
 function DreamDiary() {
   const { nfts, loading, error } = useNFTStore();
@@ -76,14 +77,16 @@ function DreamDiary() {
                 </p>
                 
                 <div className="flex space-x-4">
-                  <motion.button 
-                    whileHover={{ scale: 1.05, x: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-6 py-3 bg-white text-black font-bold uppercase border-2 border-white hover:bg-black hover:text-white transition-all flex items-center space-x-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    <span>View NFT</span>
-                  </motion.button>
+                <Link to={`/nft/${nft.tokenId}`}>
+  <motion.button 
+    whileHover={{ scale: 1.05, x: 5 }}
+    whileTap={{ scale: 0.95 }}
+    className="px-6 py-3 bg-white text-black font-bold uppercase border-2 border-white hover:bg-black hover:text-white transition-all flex items-center space-x-2"
+  >
+    <ExternalLink className="h-4 w-4" />
+    <span>View NFT</span>
+  </motion.button>
+</Link>
                   <motion.button 
                     whileHover={{ scale: 1.05, x: -5 }}
                     whileTap={{ scale: 0.95 }}

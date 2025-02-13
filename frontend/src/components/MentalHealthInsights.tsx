@@ -2,7 +2,15 @@ import React from 'react';
 import { Brain, Moon, TrendingUp, Clock, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-function MentalHealthInsights() {
+export interface MentalHealthData {
+  dreamPatterns: string;
+  emotionalState: string;
+  sleepQuality: string;
+  moodAnalysis: string;
+  weeklySummary: string;
+}
+
+export default function MentalHealthInsights({ data }: { data: MentalHealthData }) {
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -35,22 +43,22 @@ function MentalHealthInsights() {
           {
             icon: Moon,
             title: "DREAM PATTERNS",
-            content: "Your dreams this week revealed themes of exploration and personal growth, with recurring symbols of transformation."
+            content: data.dreamPatterns
           },
           {
             icon: Brain,
             title: "EMOTIONAL STATE",
-            content: "Your emotional well-being shows positive trends, with increased periods of clarity and creative inspiration."
+            content: data.emotionalState
           },
           {
             icon: Clock,
             title: "SLEEP QUALITY",
-            content: "Average sleep duration: 7.5 hours. Quality has improved by 15% compared to last week."
+            content: data.sleepQuality
           },
           {
             icon: Heart,
             title: "MOOD ANALYSIS",
-            content: "Your overall mood has been consistently positive, with notable peaks during creative activities."
+            content: data.moodAnalysis
           }
         ].map((item, index) => (
           <motion.div
@@ -86,14 +94,9 @@ function MentalHealthInsights() {
           <h2 className="text-2xl font-bold uppercase">Weekly Summary</h2>
         </div>
         <p className="font-mono leading-relaxed">
-          Your dream journal entries this week indicate a significant positive trend in your mental well-being. 
-          The recurring themes of exploration and transformation suggest a period of personal growth. 
-          Your sleep patterns have stabilized, contributing to improved emotional regulation and creativity. 
-          Continue maintaining your current sleep schedule and dream journaling practice for optimal results.
+          {data.weeklySummary}
         </p>
       </motion.div>
     </motion.div>
   );
 }
-
-export default MentalHealthInsights
