@@ -39,7 +39,7 @@ def generate_image(prompt, scene_number,texts):
             images = response_json.get("images", [])
             
             if images:
-                if (texts[0]!=""):
+                if (texts):
                     comic_image=add_comic_text(images[0],texts=texts)
                 else:
                     comic_image=images[0]

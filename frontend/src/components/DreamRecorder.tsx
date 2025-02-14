@@ -184,11 +184,19 @@ function DreamRecorder() {
           method: "POST",
           body: formData,
         });
-  
+        // const response ={
+        //   "hash": {
+        //     "fileId": "ipfs://bafkreibz32ptazwnzrtrxhwl3qsgycohmxactdy724hxshoytyttze7w64"
+        //   },
+        //   "status": "success"
+        // }
+        // const metadataHash = response;
+        
         const metadataHash = await response.json();
         console.log("Transcription result:", metadataHash);
-        setMetadataCID(metadataHash.hash);
-        const metadataContent = await fetch(`https://${metadataHash.hash}.ipfs.dweb.link`);
+        setMetadataCID(metadataHash.hash.fileId.replace("ipfs://", ""));
+        console.log(metadataCID)
+        const metadataContent = await fetch(`https://${metadataCID}.ipfs.dweb.link`);
         const metadata = await metadataContent.json();
         console.log("Metadata:", metadata);
         setCoverImage(`https://${metadata.coverImage.replace("ipfs://", "")}.ipfs.dweb.link`);

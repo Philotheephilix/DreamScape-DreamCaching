@@ -6,3 +6,4 @@
 /backend/node_modules
 /backend/creds
 frontend/bun.lockb
+speech_to_text/.cache

@@ -99,42 +99,32 @@ app.get('/callback', async (req, res) => {
 
 app.post('/tweet', async (req, res) => {
   const { accessToken, accessTokenSecret, text, mediaIds } = req.body;
-  const url = 'https://api.twitter.com/2/tweets';
-
-  const authHeader = oauth.toHeader(
-    oauth.authorize(
-      {
-        url,
-        method: 'POST',
-      },
-      {
-        key: accessToken,
-        secret: accessTokenSecret,
-      }
-    )
-  );
+  
+  const tweetData = {
+    text: text,
+    media: mediaIds ? { media_ids: mediaIds } : null
+  };
 
   try {
     const response = await axios.post(
-      url,
+      'https://api.twitter.com/2/tweets',
+      tweetData,
       {
-        text,
-        media: mediaIds ? { media_ids: mediaIds } : undefined,
-      },
-      {
-        headers: {
-          Authorization: authHeader['Authorization'],
-          'Content-Type': 'application/json',
-        },
+        headers: oauth.toHeader(oauth.authorize({
+          url: 'https://api.twitter.com/2/tweets',
+          method: 'POST'
+        }, {
+          key: accessToken,
+          secret: accessTokenSecret
+        }))
       }
     );
     res.json(response.data);
   } catch (error) {
-    console.error('Error posting tweet:', error.response ? error.response.data : error.message);
-    res.status(500).json({ error: 'Error posting tweet' });
+    console.error('Tweet error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Tweet failed' });
   }
 });
-
 const agent = new Agent({ 
   chain: "sepolia", 
   pinataJWT: process.env.VITE_PUBLIC_PINATA_JWT, 
@@ -144,7 +134,7 @@ const agent = new Agent({
 var count=100;
 async function storeJsonOnIPFS(jsonData) {
   try {
-      await agent.setupStorage('Lucid-visioasddsn-namespaces-' + count.toString());
+      await agent.setupStorage(`Lucid-vision-${uuidv4()}-json-metadata` + count.toString());
 
       // Convert JSON data to a buffer
       const jsonBuffer = Buffer.from(JSON.stringify(jsonData));
@@ -186,7 +176,7 @@ app.post('/upload-json', async (req, res) => {
 });
 async function storeImageOnIPFS(imageBuffer) {
     try {
-      await agent.setupStorage('Lucid-visioasddsn-namespaces-'+count.toString());
+      await agent.setupStorage(`Lucid-vision-${uuidv4()}-image`+count.toString());
   
       const file = await agent.create(imageBuffer);
   

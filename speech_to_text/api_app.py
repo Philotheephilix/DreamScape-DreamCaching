@@ -4,6 +4,7 @@ from transformers import pipeline
 import tempfile
 import os
 import time
+import asyncio
 from middleware import jsonValidation
 from controller.ollama import query_ollama
 from controller.veniceImage import generate_image
@@ -13,7 +14,36 @@ from controller.spotify import main as SpotifyPlaylistCreator
 
 app = Flask(__name__)
 CORS(app)
-#pipe = pipeline("automatic-speech-recognition", model="fractalego/personal-speech-to-text-model")
+pipe = pipeline("automatic-speech-recognition", model="fractalego/personal-speech-to-text-model")
+async def generate_image_async(description: str, scene_number: int, story_elements: list) -> str:
+    """
+    Asynchronous wrapper for generate_image function.
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, generate_image, description, scene_number, story_elements)
+
+async def process_scenes(validated_response_list: list) -> tuple[str, list]:
+    """
+    Process all scenes asynchronously while maintaining order.
+    """
+    full_description = ''
+    tasks = []
+    
+    for scene in validated_response_list:
+        full_description += scene["backgroundDescription"] + "\n"
+        print(scene["backgroundDescription"])
+        print("per image done")
+        
+        task = generate_image_async(
+            scene["backgroundDescription"],
+            scene["sceneNumber"],
+            list(scene["story"])
+        )
+        tasks.append(task)
+    
+    image_locations = await asyncio.gather(*tasks)
+    print("all image done")
+    return full_description, image_locations
 
 @app.route('/create-playlist', methods=['POST'])
 def create_playlist():
@@ -54,6 +84,7 @@ def transcribe_audio():
         result = pipe(tmp_path)
         transcription = result['text']
         print("transcription done")
+        print(transcription)
         os.unlink(tmp_path)
         
         ollama_response = query_ollama(transcription)["response"]
@@ -65,18 +96,18 @@ def transcribe_audio():
         image_locations=[]
         full_description=''
         for scene in validated_response_list:
-            full_description= full_description+ scene["backgroundDescription"]+"\n"
+            full_description= full_description+ scene["backgroundDescription"]+" \n"
             print(scene["backgroundDescription"])
             print("per image done")
 
-            image_locations.append(generate_image(scene["backgroundDescription"],scene["sceneNumber"],list(scene["story"])))
+            image_locations.append(generate_image(scene["backgroundDescription"],scene["sceneNumber"],scene["story"]))
         print("all image done")
         
-        cover_location=generate_image(full_description,381,[""])
+        cover_location=generate_image(full_description,381,"")
         print("cover image done")
 
-        coverData=venice_chat("Give a json with title,short_description of story, continuing this story line :"+full_description,"Return only a JSON array with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON array.")
-        coverData=jsonValidation.extract_and_validate_json(coverData)
+        coverData=venice_chat("Give a json with title,short_description of story, continuing this story line :"+full_description,"Return only a single JSON with objects containing the keys 'title', 'short_description'. Do not output any additional text or explanations, only the JSON.")
+        coverData=jsonValidation.extract_and_validate_json_version2(coverData)
         print(coverData)
         print("cover data done")
 
