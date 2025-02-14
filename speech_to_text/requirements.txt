@@ -3,3 +3,6 @@ transformers
 datasets
 soundfile
 torch
+flask
+flask_cors
+pillow
