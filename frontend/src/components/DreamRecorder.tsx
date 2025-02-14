@@ -398,13 +398,6 @@ function DreamRecorder() {
                 >
                   Mint Dream as NFT
                 </motion.button>
-                <motion.button
-                  className="w-full py-4 bg-white text-black border-2 border-black hover:bg-black hover:text-white transition-all font-bold uppercase"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Share on Twitter
-                </motion.button>
                 </div>
             </motion.div>
           </motion.div>
