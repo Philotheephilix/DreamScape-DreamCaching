@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Moon, TrendingUp, Clock, Heart } from 'lucide-react';
 import useNFTStore from '../stores/nftStore'; // Zustand store for NFT data
 import { MentalHealthData } from './MentalHealthInsights';
 
-interface NFT {
-  metadata?: {
-    description?: string;
-  };
-}
+
 interface ChatbotProps {
     onAnalysisComplete: (result: MentalHealthData) => void;
   }
@@ -36,8 +31,14 @@ function Chatbot({ onAnalysisComplete }: ChatbotProps) {
   };
 
   const handleSubmit = async () => {
-    const payload = { responses };
-
+    
+    const nftDescriptions = nfts.map(nft => nft.metadata?.fullDescription).filter(desc => desc !== undefined);
+    console.log('Submitting responses:',nftDescriptions) ;
+    const payload = {
+      responses,
+      dreams: nftDescriptions
+    };
+    console.log('Submitting data:', payload);
     try {
       const response = await fetch('http://localhost:5001/analysis', {
         method: 'POST',

@@ -8,9 +8,23 @@ function Navigation() {
   const location = useLocation();
   const [isSpotifyLoading, setIsSpotifyLoading] = useState(false);
   
-  const handleSpotifyClick = () => {
+  const handleSpotifyClick = async () => {
     setIsSpotifyLoading(true);
-    setTimeout(() => setIsSpotifyLoading(false), 2000);
+    const analysisResult = JSON.parse(sessionStorage.getItem('analysisResult') || '{}');
+    console.log( analysisResult.data?.MOOD);
+    const response = await fetch('http://localhost:5001/create-playlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mood: analysisResult.data?.MOOD
+      })
+    });
+    const data = await response.json();
+    const playlistLink = data.playlistLink;
+    window.open(playlistLink, '_blank');
+    setIsSpotifyLoading(false);
   };
   
   return (

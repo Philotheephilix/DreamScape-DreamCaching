@@ -19,12 +19,13 @@ CORS(app)
 def create_playlist():
     data = request.get_json()
     
-    if not data or 'mood' not in data or 'language' not in data:
+    if not data or 'mood' not in data :
         return jsonify({"error": "Missing required fields: mood and language"}), 400
     
     mood = data['mood']
-    language = data['language']
+    language = 'en'
     playlistLink=SpotifyPlaylistCreator(mood,language)
+    print(playlistLink)
     return jsonify({
         "status": "success",
         "mood": mood,
@@ -120,7 +121,8 @@ def dreamDataAnalysis():
         pass
     else:
         return jsonify({"error": "Invalid data format"}), 400
-    analysis_result = venice_chat("Give a json with DREAM PATTERNS, EMOTIONAL STATE, SLEEP QUALITY, MOOD ANALYSIS, Weekly Summary by words not less than 10 words by analysing data anything is null and the dreams he had"+data,"Return only a JSON array with objects containing the keys 'DREAM_PATTERNS', 'EMOTIONAL_STATE', 'SLEEP_QUALITY','MOOD_ANALYSIS', and 'Weekly_Summary'. Do not output any additional text or explanations, only the JSON array.")
+    print(data)
+    analysis_result = venice_chat("Give a json with DREAM PATTERNS, EMOTIONAL STATE, SLEEP QUALITY, MOOD ANALYSIS, Weekly Summary,MOOD by words not less than 10 words. Also analyse the dreams he had this week and analyse based on it and the dreams he had and the MOOD value should be simple like happy, sad, angry"+data,"Return only a JSON array with objects containing the keys 'DREAM_PATTERNS', 'EMOTIONAL_STATE', 'SLEEP_QUALITY','MOOD_ANALYSIS','MOOD' and 'Weekly_Summary'. Do not output any additional text or explanations, only the JSON array.")
     print(analysis_result)
     analysis_result = jsonValidation.extract_and_validate_json_version2(analysis_result)
     if isinstance(analysis_result, list) and len(analysis_result) > 0:
