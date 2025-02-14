@@ -137,7 +137,7 @@ function NFTComic() {
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 mb-6 uppercase tracking-wider"
             >
-              {nft.metadata.title || 'Untitled Dream'}
+              {nft.metadata.coverData[0].title || 'Untitled Dream'}
             </motion.h2>
 
             <motion.p
@@ -145,7 +145,7 @@ function NFTComic() {
               animate={{ opacity: 1 }}
               className="text-white/90 mb-8 text-lg font-mono leading-relaxed border-l-4 border-purple-500/50 pl-4"
             >
-              {nft.metadata.coverData || 'Description not available'}
+              {nft.metadata.coverData[0].short_description || 'Description not available'}
             </motion.p>
 
             {/* Enchanted Image Indicators */}

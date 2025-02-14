@@ -18,11 +18,11 @@ interface PostTweetProps {
 
 const PostTweet = ({isOpen, onClose ,nft}: PostTweetProps) => {
   console.log(nft?.metadata?.fullDescription);
-  const [tweetText, setTweetText] = useState<string>(nft?.metadata?.fullDescription?.slice(0,300) || '');
+  const [tweetText, setTweetText] = useState<string>(nft?.metadata?.coverData[0].short_description || '');
     const [accessToken, setAccessToken] = useState<string>('');
   const [accessTokenSecret, setAccessTokenSecret] = useState<string>('');
   const [pinCode, setPinCode] = useState<string>('');
-  const [images, setImages] = useState<string>(`https://${nft?.metadata?.coverImage.replace('ipfs://', '')}.ipfs.dweb.link` || 'no imagw');
+  const [images, setImages] = useState<string>(`https://${nft?.metadata?.coverImage?.replace('ipfs://', '')}.ipfs.dweb.link` || 'no image');
   const [mediaIds, setMediaIds] = useState<string[]>([]);
 
 
@@ -38,6 +38,8 @@ const handleAuth = async () => {
       );
       setAccessToken(response.data.accessToken);
       setAccessTokenSecret(response.data.accessTokenSecret);
+      setTweetText(nft?.metadata?.coverData[0].short_description)
+      setImages(`https://${nft?.metadata?.coverImage?.replace('ipfs://', '')}.ipfs.dweb.link` || 'no image')
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Error during callback:', error.response?.data || error.message);

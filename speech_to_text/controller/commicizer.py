@@ -21,7 +21,7 @@ def add_comic_text(base64_image,texts):
         text_height = text_bbox[3] - text_bbox[1]
         return (text_width + 2 * padding, text_height + 2 * padding)
 
-    box_sizes = [calculate_box_size(text, font, padding) for text in texts]
+    box_sizes = [calculate_box_size(texts, font, padding)]
 
     top_left_position = (50, 50)
     bottom_right_position = (
