@@ -108,20 +108,6 @@ function DreamDiary() {
               </motion.div>
 
               <div className="p-8 md:w-3/5">
-                <div className="flex items-center space-x-6 text-white mb-6 uppercase font-mono">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>
-                      {nft.metadata.date
-                        ? format(new Date(nft.metadata.timeStamp), 'dd/MM/yyyy')
-                        : 'Date not available'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{nft.metadata.timeStamp || 'Duration not available'}</span>
-                  </div>
-                </div>
 
                 <p className="text-white mb-8 text-lg font-mono leading-relaxed">
                   {nft.metadata.fullDescription || 'Description not available'}

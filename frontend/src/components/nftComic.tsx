@@ -165,19 +165,6 @@ function NFTComic() {
                 ))}
               </div>
             )}
-
-            <div className="flex space-x-4">
-              <motion.a
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-400 text-white font-bold uppercase rounded-lg hover:shadow-purple-glow transition-all flex items-center space-x-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span>View on Marketplace</span>
-              </motion.a>
-            </div>
           </div>
         </div>
       </motion.div>

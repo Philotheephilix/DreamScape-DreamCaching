@@ -40,7 +40,7 @@ def generate_image(prompt, scene_number,texts):
             
             if images:
                 if (texts):
-                    comic_image=add_comic_text(images[0],texts=texts)
+                    comic_image=add_comic_text(images[0],text=texts)
                 else:
                     comic_image=images[0]
                 upload_url = "http://localhost:5000/upload-image"
