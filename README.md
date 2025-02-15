@@ -50,18 +50,20 @@ DreamScape is an innovative platform that combines **AI**, **blockchain**, and *
    - **IPFS Integration**: Stores dream data and images on IPFS.
    - **Twitter/X Integration**: Posts dream summaries or comics to Twitter/X.
    - **API Endpoints**: Provides endpoints for frontend-backend communication.
-
+### Contracts
+   - **NFT Arbitrum Contract**:[Minting NFT's to user's wallet](https://sepolia.arbiscan.io/address/0x4e865Ed08F6D2E4432CF432f80fe199625f807B1)
 ---
 
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js (v16 or higher)
+- Node.js (v20 or higher)
 - Python (v3.8 or higher)
 - Spotify Developer Account (for API access)
 - Twitter/X Developer Account (for API access)
-- IPFS Node (local or remote)
+- IPFS Node (Pinata)
 - Venice.AI API Key
+- Ollama 
 
 ### Installation
 
